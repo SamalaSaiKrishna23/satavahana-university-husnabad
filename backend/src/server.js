@@ -10,7 +10,20 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 }
 const app = express();
 app.set('trust proxy', 1);
-app.use(helmet(), cors({ origin: process.env.CLIENT_URL || 'https://satavahana-university-husnabad-nu.vercel.app' }), express.json({ limit: '100kb' }));
+const allowedOrigins = [
+  'https://satavahana-university-husnabad-nu.vercel.app',
+  'http://localhost:5173'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked origin: ${origin}`));
+    }
+  }
+}));
 app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, limit: 5, message: { error: 'Too many login attempts. Try again later.' } }));
 app.get('/', (req, res) => {
   res.send('Satavahana University Backend is running!');
