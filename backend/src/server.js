@@ -20,6 +20,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/faculty', require('./routes/faculty'));
 app.use('/api/student', require('./routes/student'));
+app.use('/api/announcements', require('./routes/announcments'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 const dist = path.join(__dirname, '../../frontend/dist');
 app.use(express.static(dist));

@@ -190,4 +190,69 @@ router.get('/export/attendance', wrap(async (req, res) => {
   const csv = [head.join(','), ...rows.map((r) => Object.values(r).map(esc).join(','))].join('\n');
   res.set({ 'Content-Type': 'text/csv', 'Content-Disposition': 'attachment; filename="attendance.csv"' }).send(csv);
 }));
+const announcementSchema = z.object({
+  title: z.string().trim().min(3).max(150),
+  message: z.string().trim().min(5).max(5000),
+  category: z.enum(['Exam', 'Holiday', 'Event', 'General']),
+  audience: z.enum(['all', 'student', 'faculty'])
+});
+
+// Get announcements in admin dashboard
+router.get('/announcements', wrap(async (req, res) => {
+  const [rows] = await db.query(`
+    SELECT
+      a.id,
+      a.title,
+      a.message,
+      a.category,
+      a.audience,
+      a.created_at,
+      u.name AS adminName
+    FROM announcements a
+    JOIN users u ON u.id = a.published_by
+    ORDER BY a.created_at DESC
+  `);
+
+  res.json(rows);
+}));
+
+// Publish announcement
+router.post(
+  '/announcements',
+  validate(announcementSchema),
+  wrap(async (req, res) => {
+    const { title, message, category, audience } = req.body;
+
+    const [result] = await db.query(`
+      INSERT INTO announcements
+      (title, message, category, audience, published_by)
+      VALUES (?, ?, ?, ?, ?)
+    `, [
+      title,
+      message,
+      category,
+      audience,
+      req.user.id
+    ]);
+
+    res.status(201).json({
+      message: 'Announcement published',
+      id: result.insertId
+    });
+  })
+);
+
+// Delete announcement
+router.delete('/announcements/:id', wrap(async (req, res) => {
+  const [result] = await db.query(
+    'DELETE FROM announcements WHERE id = ?',
+    [req.params.id]
+  );
+
+  if (!result.affectedRows) {
+    throw err(404, 'Announcement not found');
+  }
+
+  res.json({ message: 'Announcement deleted' });
+}));
 module.exports = router;

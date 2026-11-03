@@ -37,9 +37,14 @@ const { nextUserId, fmt } = require('./utils');
     'Manish Yadav', 'Lakshmi Devi', 'Faizan Khan', 'Tanvi Kulkarni'];
   const students = [];
   for (let i = 0; i < 70; i++) {
-    const dept = i < 12 ? 'CSE' : 'ECE', uid = await mkUser('STU', dept, names[i], 'student');
-    const id = (await db.query('INSERT INTO students(user_id,department_id,year,semester,section,roll_no) VALUES(?,?,2,3,"A",?)',
-      [uid, D[dept], `R${String(i + 1).padStart(3, '0')}`]))[0].insertId;
+    const dept = i < 12 ? 'CSE' : 'ECE',
+          uid = await mkUser('STU', dept, names[i], 'student');
+
+    const id = (await db.query(
+      'INSERT INTO students(user_id,department_id,year,semester,section,roll_no) VALUES(?,?,2,3,?,?)',
+      [uid, D[dept], 'A', `R${String(i + 1).padStart(3, '0')}`]
+    ))[0].insertId;
+
     students.push({ id, dept, low: i % 5 === 0 });
   }
   const rows = [];

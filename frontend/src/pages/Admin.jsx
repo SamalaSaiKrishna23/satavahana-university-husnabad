@@ -152,3 +152,187 @@ export function Setup() {
     </div>
   );
 }
+export function ManageAnnouncements() {
+
+  const { data: announcements, reload } = useLoad(
+    () => api('/admin/announcements')
+  );
+
+  const [form, setForm] = useState({
+    title: '',
+    message: '',
+    category: 'General',
+    audience: 'all'
+  });
+
+  const publish = async (e) => {
+    e.preventDefault();
+
+    try {
+      await api('/admin/announcements', {
+        method: 'POST',
+        body: form
+      });
+
+      alert('Announcement published successfully!');
+
+      setForm({
+        title: '',
+        message: '',
+        category: 'General',
+        audience: 'all'
+      });
+
+      reload();
+
+    } catch (error) {
+      fail(error);
+    }
+  };
+
+  const remove = async (id) => {
+
+    if (!confirm('Delete this announcement?')) return;
+
+    try {
+      await api(`/admin/announcements/${id}`, {
+        method: 'DELETE'
+      });
+
+      reload();
+
+    } catch (error) {
+      fail(error);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+
+      <Card title="Publish New Announcement">
+
+        <form onSubmit={publish} className="space-y-4">
+
+          <Field
+            label="Announcement Title"
+            required
+            value={form.title}
+            onChange={e => setForm({
+              ...form,
+              title: e.target.value
+            })}
+          />
+
+          <label className="block text-sm text-slate-600">
+            Announcement Message
+
+            <textarea
+              required
+              rows="5"
+              className="mt-1 w-full border border-slate-300
+                rounded-lg p-3"
+              value={form.message}
+              onChange={e => setForm({
+                ...form,
+                message: e.target.value
+              })}
+            />
+          </label>
+
+          <div className="grid md:grid-cols-2 gap-4">
+
+            <label className="block text-sm text-slate-600">
+              Category
+
+              <select
+                className="mt-1 w-full border rounded-lg p-2"
+                value={form.category}
+                onChange={e => setForm({
+                  ...form,
+                  category: e.target.value
+                })}
+              >
+                <option value="General">General</option>
+                <option value="Exam">Exam</option>
+                <option value="Holiday">Holiday</option>
+                <option value="Event">Event</option>
+              </select>
+            </label>
+
+            <label className="block text-sm text-slate-600">
+              Publish To
+
+              <select
+                className="mt-1 w-full border rounded-lg p-2"
+                value={form.audience}
+                onChange={e => setForm({
+                  ...form,
+                  audience: e.target.value
+                })}
+              >
+                <option value="all">Everyone</option>
+                <option value="student">Students Only</option>
+                <option value="faculty">Faculty Only</option>
+              </select>
+            </label>
+
+          </div>
+
+          <Btn>Publish Announcement</Btn>
+
+        </form>
+
+      </Card>
+
+      <Card title="Published Announcements">
+
+        {!announcements ? (
+          <p>Loading...</p>
+        ) : announcements.length === 0 ? (
+          <p className="text-slate-500">
+            No announcements published yet.
+          </p>
+        ) : (
+          <div className="space-y-3">
+
+            {announcements.map(item => (
+
+              <div
+                key={item.id}
+                className="border rounded-lg p-4
+                  flex justify-between gap-3"
+              >
+
+                <div>
+                  <h3 className="font-semibold">
+                    {item.title}
+                  </h3>
+
+                  <p className="text-sm text-slate-600 mt-2">
+                    {item.message}
+                  </p>
+
+                  <p className="text-xs text-slate-400 mt-2">
+                    {item.category} · {item.audience}
+                  </p>
+                </div>
+
+                <Btn
+                  color="red"
+                  onClick={() => remove(item.id)}
+                >
+                  Delete
+                </Btn>
+
+              </div>
+
+            ))}
+
+          </div>
+        )}
+
+      </Card>
+
+    </div>
+  );
+}
