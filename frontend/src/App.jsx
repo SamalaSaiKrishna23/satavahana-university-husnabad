@@ -134,7 +134,7 @@ const ROLES = {
     hint: "Manage students, faculty and setup",
     cls: "bg-slate-800 hover:bg-slate-900",
   },
-};
+};console
 
 function Login({ onLogin, initialRole=null, onBack }) {
   const [role, setRole] = useState(initialRole);
@@ -155,7 +155,7 @@ function Login({ onLogin, initialRole=null, onBack }) {
       });
       localStorage.setItem("token", r.token);
       onLogin(r.user);
-    } catch (x) {
+    }catch (x) {
       setErr(x.message);
     }
   };

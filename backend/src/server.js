@@ -12,6 +12,7 @@ const app = express();
 app.set('trust proxy', 1);
 const allowedOrigins = [
   'https://satavahana-university-husnabad-nu.vercel.app',
+  'https://satavahana-university-husnabad-git-master-sandeepsai.vercel.app/',
   'http://localhost:5173'
 ];
 
@@ -25,7 +26,7 @@ app.use(cors({
     }
   }
 }));
-app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, limit: 5, message: { error: 'Too many login attempts. Try again later.' } }));
+app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, message: { error: 'Too many login attempts. Try again later.' } }));
 app.get('/', (req, res) => {
   res.send('Satavahana University Backend is running!');
 });

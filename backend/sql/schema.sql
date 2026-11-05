@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS attendance_db CHARACTER SET utf8mb4;
-USE attendance_db;
+CREATE DATABASE IF NOT EXISTS defaultdb CHARACTER SET utf8mb4;
+USE defaultdb;
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS attendance, class_assignments, subjects, students, faculty, users, departments;
 SET FOREIGN_KEY_CHECKS=1;
